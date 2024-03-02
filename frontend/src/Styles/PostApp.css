@@ -1,4 +1,4 @@
-/* Form Styles */
+
 .form-wrapper {
     background-color: #f9f9f9;
     padding: 20px;
@@ -22,7 +22,6 @@
     border-radius: 5px;
 }
 
-/* Button Styles */
 .btn-submit[type="submit"] {
     width: 10%;
     border-radius: 100px;
@@ -39,12 +38,11 @@
     background-color: #0056b3;
 }
 
-/* Date Time Picker Styles */
 .react-calendar-datetime-picker {
     width: 100%;
 }
 
-/* Media Queries */
+
 @media (min-width: 768px) {
     .form-wrapper {
         max-width: 1000px;

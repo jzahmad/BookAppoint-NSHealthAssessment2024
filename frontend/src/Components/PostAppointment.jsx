@@ -3,9 +3,9 @@ import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import { Link } from "react-router-dom";
 import '../Styles/homepage.css';
-import { DtPicker } from 'react-calendar-datetime-picker'
-import 'react-calendar-datetime-picker/dist/style.css'
-import '../Styles/PostApp.css'
+import { DtPicker } from 'react-calendar-datetime-picker';
+import 'react-calendar-datetime-picker/dist/style.css';
+import '../Styles/PostApp.css';
 
 function Post() {
   const [name, setName] = useState('');
@@ -16,9 +16,8 @@ function Post() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Here you can handle the form submission, e.g., send data to a server
     const formData = { name, date, reason, duration, selectedHospital };
-    console.log(formData); // Example: Logging form data
+    console.log(formData); 
   }
 
   const FacilityList = () => {
@@ -91,9 +90,9 @@ function Post() {
 
       <div className="form-wrapper">
         <Form onSubmit={handleSubmit}>
-          <div className="form-group react-calendar-datetime-picker">
+          <div className="form-group">
             <label>Date & Time</label>
-            <DtPicker onChange={setDate} withTime={true} value={date}/>
+            <DtPicker onChange={(newDate) => setDate(newDate)} withTime={true} value={date}/>
           </div>
 
           <Form.Group className="form-group">

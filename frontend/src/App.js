@@ -6,6 +6,7 @@ import HomePage from './Components/homepage';
 import Pick from './Components/PickAppointment'; 
 import Post from './Components/PostAppointment'; 
 import YourSchedule from './Components/YourSchedule'; 
+import Apply from './Components/ApplyAppoint';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/pick-appointments" element={<Pick />} />
           <Route path="/post-appointment" element={<Post />} />
           <Route path="/your-schedule" element={<YourSchedule />} />
+          <Route path="/apply" element={<Apply />} />
         </Routes>
       </div>
     </Router>

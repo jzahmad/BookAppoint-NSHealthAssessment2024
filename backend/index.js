@@ -162,11 +162,11 @@ app.get('/pick', (req, res) => {
  * apply funtionality
  */
 app.post('/apply', (req, res) => {
-  const { userid, name, reason, prev, contact } = req.body;
+  const { name, healthId, prev, contact } = req.body;
 
   // Insert data into MySQL table
-  connection.query('INSERT INTO apply (userid, name, reason, prev, contact) VALUES (?, ?, ?, ?, ?)', 
-      [userid, name, reason, prev, contact], 
+  connection.query('INSERT INTO apply (userid, name, healthId, prev, contact) VALUES (?, ?, ?, ?, ?)', 
+      [1, name, healthId, prev, contact], 
       (error, results, fields) => {
           if (error) {
               res.status(500).send('Error inserting data');

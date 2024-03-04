@@ -67,7 +67,7 @@ function Schedule() {
                 <Card.Text>Hospital: {appointment.hospital}</Card.Text>
                 <Card.Text>Duration: {appointment.duration}</Card.Text>
                 <Card.Text>Type: {appointment.type}</Card.Text>
-                <Button variant="primary" onClick={handleApply}>Cancel</Button>
+                <Button variant="primary" onClick={handleApply}>Back To Trade</Button>
               </Card.Body>
             </Card>
           </div>

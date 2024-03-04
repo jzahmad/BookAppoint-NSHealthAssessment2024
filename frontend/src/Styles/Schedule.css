@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 20px; /* Added padding to compensate for removed navbar */
+    padding-top: 20px;
   }
   
   .card-container {
@@ -21,5 +21,24 @@
   
   .doctor-card .btn-primary {
     margin-top: 10px;
+  }
+  .search-bar {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  .search-select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
   }
   

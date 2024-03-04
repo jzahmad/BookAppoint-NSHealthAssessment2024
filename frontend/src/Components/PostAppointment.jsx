@@ -6,18 +6,55 @@ import '../Styles/homepage.css';
 import { DtPicker } from 'react-calendar-datetime-picker';
 import 'react-calendar-datetime-picker/dist/style.css';
 import '../Styles/PostApp.css';
+import axios from 'axios';
 
 function Post() {
   const [name, setName] = useState('');
   const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState('');
   const [reason, setReason] = useState('');
   const [duration, setDuration] = useState('');
   const [selectedHospital, setSelectedHospital] = useState('');
+  const [errorMessages,setErrorMessage]=useState('');
 
-  const handleSubmit = (event) => {
+  const dataValidation = () => {
+    const regex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
+
+    if (!date) {
+      setErrorMessage("Please select a date");
+    } else if (!time.trim() || !regex.test(time)) {
+      setErrorMessage("Please enter a valid time in HH:MM:SS");
+    } else if (!reason.trim()) {
+      setErrorMessage("Please enter the type of appointment");
+    } else if (!name.trim()) {
+      setErrorMessage("Please enter your name");
+    } else if (!duration.trim() || isNaN(duration) || parseInt(duration) <= 0) {
+      setErrorMessage("Please enter a valid duration in minutes");
+    } else if (!selectedHospital) {
+      setErrorMessage("Please select a hospital");
+    } else {
+      setErrorMessage("");
+      return true; 
+    }
+    return false;
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const formData = { name, date, reason, duration, selectedHospital };
-    console.log(formData); 
+    
+    if (!dataValidation()) {
+      return;
+    }
+
+    const formData = { date, time, reason, duration, selectedHospital };
+    try {
+
+      const response = await axios.post('http://localhost:80/post', formData);
+      setErrorMessage(response.data.message);
+     
+    } catch (error) {
+      setErrorMessage("Error in posting appointmet"); 
+    }
   }
 
   const FacilityList = () => {
@@ -91,9 +128,14 @@ function Post() {
       <div className="form-wrapper">
         <Form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Date & Time</label>
-            <DtPicker onChange={(newDate) => setDate(newDate)} withTime={true} value={date}/>
+            <label>Date</label>
+            <DtPicker onChange={(date) => setDate(date)} value={time}/>
           </div>
+
+          <Form.Group className="form-group">
+            <Form.Label>Time (HH:MM:SS)</Form.Label>
+            <Form.Control type="text" value={time} onChange={(e) => setTime(e.target.value)}/>
+          </Form.Group>
 
           <Form.Group className="form-group">
             <Form.Label>Type of Appointment</Form.Label>
@@ -119,7 +161,7 @@ function Post() {
               ))}
             </Form.Control>
           </Form.Group> 
-
+          {errorMessages && <div style={{ color: 'red' }}>{errorMessages}</div>}
           <Button className='btn-submit' block size="lg" type="submit">Submit</Button>  
         </Form>   
       </div>

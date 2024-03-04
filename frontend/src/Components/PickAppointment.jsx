@@ -1,29 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import '../Styles/homepage.css'; 
-import 'bootstrap/dist/css/bootstrap.min.css';
 import '../Styles/PickApp.css';
+import axios from 'axios';
+
 
 function Post() {
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  
+  const [searchBy, setSearchBy] = useState('hospital'); 
+  const [appointments, setAppointments] = useState([]);
+
+  const navigate=useNavigate();
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get("http://localhost:80/pick");
+        setAppointments(response.data.results);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+      }
+    }
+    fetchData();
+  }, []);
+
   const handleApply = () => {
-    navigate('/apply');
+    navigate("/apply")
   };
 
-  // Dummy data for appointments
-  const appointments = [
-    { hospital: "Hospital 1", duration: "2 hours", type: "General", doctor: "Dr. Smith" },
-    { hospital: "Hospital 2", duration: "1 hour", type: "Specialist", doctor: "Dr. Johnson" }
-    // Add more dummy data as needed
-  ];
+  const handleSearchByChange = (e) => {
+    setSearchBy(e.target.value);
+  };
 
-  // Filter appointments based on search query
+  // Filter appointments based on search query and search by option
   const filteredAppointments = appointments.filter(appointment =>
-    appointment.hospital.toLowerCase().includes(searchQuery.toLowerCase())
+    appointment[searchBy].toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -36,14 +48,23 @@ function Post() {
           <Link to="/your-schedule" className="nav-link">Your Schedule</Link>
         </nav>
       </div>
+
       <div className="search-bar">
         <input
+          className="search-input"
           type="text"
-          placeholder="Search by Hospital"
+          placeholder={`Search by ${searchBy}`}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
+        <select className="search-select" value={searchBy} onChange={handleSearchByChange}>
+          <option value="hospital">Hospital</option>
+          <option value="duration">Duration</option>
+          <option value="type">Type</option>
+          <option value="dateTime">Date & Time</option>
+        </select>
       </div>
+      
       <div className="post-container">
         {filteredAppointments.map((appointment, index) => (
           <div key={index} className="post-item">
@@ -52,7 +73,7 @@ function Post() {
                 <Card.Title>{appointment.hospital}</Card.Title>
                 <Card.Text>Duration: {appointment.duration}</Card.Text>
                 <Card.Text>Type: {appointment.type}</Card.Text>
-                <Card.Text>Doctor name: {appointment.doctor}</Card.Text>
+                <Card.Text>Date & Time: {appointment.dateTime}</Card.Text>
                 <Button variant="primary" onClick={handleApply}>Apply</Button>
               </Card.Body>
             </Card>

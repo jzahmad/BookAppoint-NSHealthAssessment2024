@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
@@ -8,10 +8,28 @@ import '../Styles/Schedule.css';
 
 function Schedule() {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchBy, setSearchBy] = useState('doctor'); // Default search by doctor
   
   const handleApply = () => {
-    navigate('/pick-appointments');
+    navigate('/homepage');
   };
+
+  const handleSearchByChange = (e) => {
+    setSearchBy(e.target.value);
+  };
+
+  // Dummy data for appointments
+  const appointments = [
+    
+    { doctor: "John Doe", hospital: "City Hospital", duration: "1 hour", type: "Regular Checkup" }
+
+  ];
+
+  // Filter appointments based on search query and search by option
+  const filteredAppointments = appointments.filter(appointment =>
+    appointment[searchBy].toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div>
@@ -23,27 +41,37 @@ function Schedule() {
           <Link to="/your-schedule" className="nav-link">Your Schedule</Link>
         </nav>
       </div>
-      <div className="card-container">
-        <Card className="doctor-card">
-          <Card.Body>
-            <Card.Text>Dr. Name: John Doe</Card.Text>
-            <Card.Text>Hospital: City Hospital</Card.Text>
-            <Card.Text>Duration: 1 hour</Card.Text>
-            <Card.Text>Type: Regular Checkup</Card.Text>
-            <Button variant="primary" onClick={handleApply}>Cancel</Button>
-          </Card.Body>
-        </Card>
+
+      <div className="search-bar">
+        <input
+          className="search-input"
+          type="text"
+          placeholder={`Search by ${searchBy}`}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select className="search-select" value={searchBy} onChange={handleSearchByChange}>
+          <option value="doctor">Doctor</option>
+          <option value="hospital">Hospital</option>
+          <option value="duration">Duration</option>
+          <option value="type">Type</option>
+        </select>
       </div>
+
       <div className="card-container">
-        <Card className="doctor-card">
-          <Card.Body>
-            <Card.Text>Dr. Name: John Doe</Card.Text>
-            <Card.Text>Hospital: City Hospital</Card.Text>
-            <Card.Text>Duration: 1 hour</Card.Text>
-            <Card.Text>Type: Regular Checkup</Card.Text>
-            <Button variant="primary" onClick={handleApply}>Cancel</Button>
-          </Card.Body>
-        </Card>
+        {filteredAppointments.map((appointment, index) => (
+          <div key={index} className="doctor-card">
+            <Card>
+              <Card.Body>
+                <Card.Text>Dr. Name: {appointment.doctor}</Card.Text>
+                <Card.Text>Hospital: {appointment.hospital}</Card.Text>
+                <Card.Text>Duration: {appointment.duration}</Card.Text>
+                <Card.Text>Type: {appointment.type}</Card.Text>
+                <Button variant="primary" onClick={handleApply}>Cancel</Button>
+              </Card.Body>
+            </Card>
+          </div>
+        ))}
       </div>
     </div>
   );

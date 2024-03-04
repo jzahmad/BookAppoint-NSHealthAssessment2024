@@ -26,4 +26,16 @@
     background-color: #555;
     border-radius: 5px;
   }
+
+.links-container {
+    display: flex;
+    justify-content: space-between; /* Adjust this property based on your preference */
+}
+
+.link {
+    text-decoration: none;
+    color: #007bff; /* You can adjust the color as needed */
+    margin-right: 10px; /* Adjust the spacing between links */
+}
+
   

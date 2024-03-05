@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+// Login.js
+import React, { useState,useContext } from 'react';
+import { Link, useNavigate  } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios'; // Import Axios
 import '../Styles/login.css';
+import { context } from './Context';
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [messages, setMessages] = useState("");
+
     const navigate = useNavigate(); 
+    const { userID, setuserID } = useContext(context);
 
     const url="http://localhost:80";
 
@@ -27,12 +31,22 @@ function Login() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if( email === "admin@admin.com" && password === "admin"){
+            navigate("admin/all-appointments");
+        }
+
         if (!handleValidation()) {
             return;
         }
+
         try {
             const response = await axios.post(`${url}/login`, { email, password });
-            navigate("/homepage");
+            setuserID(response.data.userID);
+            console.log(response)
+            setTimeout(() => {
+                navigate(`/homepage/${response.data.userID}`);
+            }, 3000);
         } catch (error) {
             setMessages(error.response.data);
         }

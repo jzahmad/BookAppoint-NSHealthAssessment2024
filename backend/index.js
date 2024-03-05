@@ -57,28 +57,51 @@ app.post('/CreateUser', (req, res) => {
 
 
 /*
-*To login user
+*To pick user
 */
 
-app.post('/login', (req, res) => {
-    const { email, password } = req.body;
+app.post('/pick', (req, res) => {
+  const userID = req.body.id; // Access request body to get the userID
 
-    // find user
-    connection.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, password], (error, results, fields) => {
-      if (error) {
-        res.status(500).send( 'Internal server error' );
-      }
-  
-      // If no user is found
-      if (results.length === 0) {
-        res.status(404).send( 'User not found' );
-        return;
-      }
-  
-      // If the user is found
-      res.status(200).send('User found success');
-    });
+  // Query the database to fetch appointments excluding those with the specified user ID
+  connection.query('SELECT PostID, SelectedHospital AS hospital, Duration AS duration, CONCAT(Date, " ", Time) AS dateTime, Reason AS type FROM Posts WHERE UserID != ?', [userID], (error, results, fields) => {
+    if (error) {
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+
+    // If there are no results, send an empty array
+    if (results.length === 0) {
+      res.status(200).json({ hospitals: [] });
+      return;
+    }
+
+    // Send the retrieved data as response
+    res.status(200).json({ results });
   });
+});
+
+/**
+ * all appointments
+ */
+app.get('/all', (req, res) => {
+  // Query the database to fetch all appointments
+  connection.query('SELECT p.PostID, SelectedHospital AS hospital, Duration AS duration, CONCAT(Date, " ", Time) AS dateTime, Reason AS type, COUNT(a.PostID) AS numberOfApplicants FROM Posts p LEFT JOIN apply a ON p.PostID = a.PostID GROUP BY p.PostID, hospital, duration, dateTime, type', (error, results, fields) => {
+    if (error) {
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+
+    // If there are no results, send an empty array
+    if (results.length === 0) {
+      res.status(200).json({ appointments: [] });
+      return;
+    }
+
+    // Send the retrieved data as response
+    res.status(200).json({ appointments: results });
+  });
+});
 
 /**
  * Forget Password
@@ -112,6 +135,7 @@ app.post('/forget', (req, res) => {
  */
 
 app.post('/post', (req, res) => {
+  const id=req.body.userID;
   const year = req.body.date.year;
   const month = String(req.body.date.month).padStart(2, '0'); // Zero-pad month
   const day = String(req.body.date.day).padStart(2, '0'); // Zero-pad day
@@ -126,7 +150,7 @@ app.post('/post', (req, res) => {
   console.log(req.body);
   // Insert the appointment
   connection.query('INSERT INTO Posts (UserID, Date, Time, Reason, Duration, SelectedHospital) VALUES (?, ?, ?, ?, ?, ?)', 
-    [1, DateOf, Time, Reason, Duration, SelectedHospital], (error, results, fields) => {
+    [id, DateOf, Time, Reason, Duration, SelectedHospital], (error, results, fields) => {
 
       if (error) {
         console.error('Error posting appointment:', error);
@@ -138,23 +162,28 @@ app.post('/post', (req, res) => {
   });
 });
 
+/**
+ * login functionality
+ */
 
-app.get('/pick', (req, res) => {
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
 
-  // Query the database to 
-  connection.query('SELECT SelectedHospital AS hospital, Duration AS duration, CONCAT(Date, " ", Time) AS dateTime, Reason AS type FROM Posts', (error, results, fields) => {
+  // find user
+  connection.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, password], (error, results, fields) => {
     if (error) {
-      res.status(500).json({ error: 'Internal server error' }); 
+      res.status(500).send( 'Internal server error' );
     }
 
-    // If there are no results, send an empty array
+    // If no user is found
     if (results.length === 0) {
-      res.status(200).json({ hospitals: [] });
+      res.status(404).send( 'User not found' );
       return;
     }
 
-    // Send the retrieved data as response
-    res.status(200).json({results });
+    // If the user is found
+    const userID = results[0].user_id;
+    res.status(200).json({ userID });
   });
 });
 
@@ -162,11 +191,11 @@ app.get('/pick', (req, res) => {
  * apply funtionality
  */
 app.post('/apply', (req, res) => {
-  const { name, healthId, prev, contact } = req.body;
+  const { userid, name, healthId, prev, contact, postID } = req.body;
 
   // Insert data into MySQL table
-  connection.query('INSERT INTO apply (userid, name, healthId, prev, contact) VALUES (?, ?, ?, ?, ?)', 
-      [1, name, healthId, prev, contact], 
+  connection.query('INSERT INTO apply (userid, name, healthId, prev, contact, PostID) VALUES (?, ?, ?, ?, ?, ?)', 
+      [userid, name, healthId, prev, contact,postID], 
       (error, results, fields) => {
           if (error) {
               res.status(500).send('Error inserting data');
@@ -175,6 +204,20 @@ app.post('/apply', (req, res) => {
           }
   });
 });
+
+app.post('/applicants', (req, res) => {
+  const postId  = req.body.postId;
+ 
+  // Insert data into MySQL table
+  connection.query('SELECT name, healthId, contact, prev FROM apply WHERE postID = ?', postId, (error, results, fields) => {
+    if (error) {
+      res.status(500).json({ error: 'Error retrieving applicants' });
+    } else {
+        res.status(200).json({ results });
+      }
+    });
+  });
+
   
 // Start the server
 app.listen(port, () => {

@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import '../Styles/homepage.css';
 import { DtPicker } from 'react-calendar-datetime-picker';
 import 'react-calendar-datetime-picker/dist/style.css';
 import '../Styles/PostApp.css';
 import axios from 'axios';
+import { context } from './Context';
 
 function Post() {
+
+  const navigate = useNavigate();
+  const { userID } = useContext(context);
+
   const [name, setName] = useState('');
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState('');
@@ -46,7 +51,7 @@ function Post() {
       return;
     }
 
-    const formData = { date, time, reason, duration, selectedHospital };
+    const formData = { userID, date, time, reason, duration, selectedHospital };
     try {
 
       const response = await axios.post('http://localhost:80/post', formData);
@@ -119,9 +124,9 @@ function Post() {
       <div className="navbar">
         <h1 className="logo">BookAppoint</h1>
         <nav className="nav-links">
-          <Link to="/pick-appointments" className="nav-link">Pick Appointments</Link>
-          <Link to="/post-appointment" className="nav-link active">Post Appointment</Link>
-          <Link to="/your-schedule" className="nav-link">Your Schedule</Link>
+          <Link to={`/pick-appointments/${userID}`} className="nav-link">Pick Appointments</Link>
+          <Link to={`/post-appointment/${userID}`} className="nav-link">Post Appointment</Link>
+          <Link to={`/your-schedule/${userID}`} className="nav-link">Your Schedule</Link>
         </nav>
       </div>
 

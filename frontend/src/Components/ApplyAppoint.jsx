@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import "../Styles/ApplyApp.css";
 import { Form, Button, Row, Col } from 'react-bootstrap';
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useParams  } from "react-router-dom";
 import axios from 'axios'; // Import Axios
+import { context } from './Context'
 
 function Apply() {
   const [showApplyModal, setShowApplyModal] = useState(true);
@@ -11,12 +12,15 @@ function Apply() {
   const [prev, setPrev] = useState('');
   const [contact, setContact] = useState('');
   const [errorMessages, setErrorMessage] = useState('');
+  const { postID } = useParams(); // Get postID from URL
+ 
 
   const navigate = useNavigate();
+  const {userID} = useParams();
 
   const handleCloseModal = () => {
     setShowApplyModal(false);
-    navigate('/pick-appointments');
+    navigate(`/pick-appointments/${userID}`);
   };
 
   const dataValidation = () => {
@@ -42,10 +46,12 @@ function Apply() {
     if (isValid) {
       try {
         const response = await axios.post('http://localhost:80/apply', {
+          userid:userID,
           name: name,
           healthId: healthId,
           prev: prev,
-          contact: contact
+          contact: contact,
+          postID: postID // Include postID in the request
         });
 
         setErrorMessage(response.data); // Handle response from the server as needed
@@ -56,6 +62,7 @@ function Apply() {
       }
     }
   };
+
 
   return (
     <div>

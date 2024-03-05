@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import '../Styles/homepage.css'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../Styles/Schedule.css';
+import { context } from './Context';
 
 function Schedule() {
+
+  const { userID } = useContext(context);
+
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchBy, setSearchBy] = useState('doctor'); // Default search by doctor
@@ -36,9 +40,9 @@ function Schedule() {
       <div className="navbar">
         <h1 className="logo">BookAppoint</h1>
         <nav className="nav-links">
-          <Link to="/pick-appointments" className="nav-link">Pick Appointments</Link>
-          <Link to="/post-appointment" className="nav-link active">Post Appointment</Link>
-          <Link to="/your-schedule" className="nav-link">Your Schedule</Link>
+          <Link to={`/pick-appointments/${userID}`} className="nav-link">Pick Appointments</Link>
+          <Link to={`/post-appointment/${userID}`} className="nav-link">Post Appointment</Link>
+          <Link to={`/your-schedule/${userID}`} className="nav-link">Your Schedule</Link>
         </nav>
       </div>
 

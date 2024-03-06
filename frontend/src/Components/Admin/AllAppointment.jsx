@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import '../../Styles/PickApp.css';
 import axios from 'axios';
 
 function AllAppointments() {
@@ -33,8 +32,21 @@ function AllAppointments() {
       console.error('Error fetching applicants:', error);
     }
   };
+
+  const handleApprove = async (postId, healthId, hospital, duration, dateTime) => {
+    const form = { postId, healthId, hospital, duration, dateTime };
+    try {
+      await axios.post(`http://localhost:80/approve`, { form });
+      // Filter out the deleted appointment from the appointments array
+      const updatedAppointments = appointments.filter(appointment => appointment.PostID !== postId);
+      setAppointments(updatedAppointments);
+    } catch (error) {
+      console.error('Error approving appointment:', error);
+    }
+  };
   
 
+  console.log(appointments)
   const handleSearchByChange = (e) => {
     setSearchBy(e.target.value);
   };
@@ -44,9 +56,10 @@ function AllAppointments() {
       <div className="navbar">
         <h1 className="logo">BookAppoint (admin)</h1>
         <nav className="nav-links">
-          <Link to={`admin/all-appointments`} className="nav-link">All Appointments</Link>
-          <Link to={`admin/post-appointment`} className="nav-link active">Post Appointment</Link>
-        </nav>
+  <Link to="/admin/all-appointments" className="nav-link">All Appointments</Link>
+  <Link to="/admin/post-appointment" className="nav-link active">Post Appointment</Link>
+</nav>
+
       </div>
 
       <div className="search-bar">
@@ -77,13 +90,14 @@ function AllAppointments() {
                 <Card.Text>Number of Applicants: {appointment.numberOfApplicants}</Card.Text>
                 <Button variant="primary" onClick={() => handleApply(appointment.PostID, index)}>See Applicants</Button>
                 <ul>
-                <br/>
                   {appointment.applicants && appointment.applicants.map((applicant, applicantIndex) => (
                     <li key={applicantIndex}>
                       <strong>Name: </strong> {applicant.name}<br />
                       <strong>Health ID: </strong> {applicant.healthId}<br />
                       <strong>Contact: </strong> {applicant.contact}<br />
                       <strong>Previous: </strong> {applicant.prev}<br />
+                      <Button variant="primary" onClick={() => handleApprove(appointment.PostID,applicant.healthId, appointment.hospital, appointment.duration
+                        ,appointment.dateTime)}>Approve</Button>
                       <br />
                     </li>
                   ))}

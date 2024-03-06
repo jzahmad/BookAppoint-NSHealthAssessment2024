@@ -1,44 +1,48 @@
 .schedule-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 20px;
-  }
-  
-  .card-container {
-    margin-top: 20px;
-  }
-  
-  .doctor-card {
-    width: 300px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-  }
-  
-  .doctor-card .card-body {
-    padding: 20px;
-  }
-  
-  .doctor-card .btn-primary {
-    margin-top: 10px;
-  }
-  .search-bar {
-    margin: 20px 0;
-    display: flex;
-    align-items: center;
-  }
-  
-  .search-input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-right: 10px;
-  }
-  
-  .search-select {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.card-container {
+  display: flex; /* Change to flex display */
+  flex-wrap: wrap; /* Allow cards to wrap to the next line */
+  justify-content: center; /* Center the cards horizontally */
+  margin-top: 20px;
+}
+
+.doctor-card {
+  width: 300px;
+  margin: 10px; /* Add margin for spacing between cards */
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+}
+
+.doctor-card .card-body {
+  padding: 20px;
+}
+
+.doctor-card .btn-primary {
+  margin-top: 10px;
+}
+
+.search-bar {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.search-select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}

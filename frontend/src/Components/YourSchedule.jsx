@@ -1,20 +1,33 @@
-import React, { useState, useContext } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
 import '../Styles/homepage.css'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../Styles/Schedule.css';
-import { context } from './Context';
 
 function Schedule() {
-
-  const { userID } = useContext(context);
-
+  const userID = useParams().userID;
+  console.log(userID);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchBy, setSearchBy] = useState('doctor'); // Default search by doctor
-  
+  const [searchBy, setSearchBy] = useState('hospital');
+  const [appointments, setAppointments] = useState([]);
+
+  useEffect(() => {
+    async function fetchAppointments() {
+      try {
+        console.log(userID);
+        const response = await axios.post(`http://localhost:80/schedules`, { userID });
+        setAppointments(response.data.schedules);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+      }
+    }
+    fetchAppointments();
+  }, [userID]);
+
   const handleApply = () => {
     navigate('/homepage');
   };
@@ -23,17 +36,10 @@ function Schedule() {
     setSearchBy(e.target.value);
   };
 
-  // Dummy data for appointments
-  const appointments = [
-    
-    { doctor: "John Doe", hospital: "City Hospital", duration: "1 hour", type: "Regular Checkup" }
-
-  ];
-
-  // Filter appointments based on search query and search by option
-  const filteredAppointments = appointments.filter(appointment =>
-    appointment[searchBy].toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+  };
 
   return (
     <div>
@@ -55,7 +61,6 @@ function Schedule() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <select className="search-select" value={searchBy} onChange={handleSearchByChange}>
-          <option value="doctor">Doctor</option>
           <option value="hospital">Hospital</option>
           <option value="duration">Duration</option>
           <option value="type">Type</option>
@@ -63,15 +68,14 @@ function Schedule() {
       </div>
 
       <div className="card-container">
-        {filteredAppointments.map((appointment, index) => (
+        {appointments.map((appointment, index) => (
           <div key={index} className="doctor-card">
             <Card>
               <Card.Body>
-                <Card.Text>Dr. Name: {appointment.doctor}</Card.Text>
-                <Card.Text>Hospital: {appointment.hospital}</Card.Text>
-                <Card.Text>Duration: {appointment.duration}</Card.Text>
-                <Card.Text>Type: {appointment.type}</Card.Text>
-                <Button variant="primary" onClick={handleApply}>Back To Trade</Button>
+                <Card.Text><strong>Hospital:</strong> {appointment.hospital}</Card.Text>
+                <Card.Text><strong>Date:</strong> {formatDate(appointment.s_date)}</Card.Text>
+                <Card.Text><strong>Time:</strong> {appointment.s_time}</Card.Text>
+                <Card.Text><strong>Duration:</strong> {appointment.duration}</Card.Text>
               </Card.Body>
             </Card>
           </div>

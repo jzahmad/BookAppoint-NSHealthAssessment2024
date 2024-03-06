@@ -1,18 +1,20 @@
 import React, { useState, useContext } from 'react';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import '../Styles/homepage.css';
 import { DtPicker } from 'react-calendar-datetime-picker';
 import 'react-calendar-datetime-picker/dist/style.css';
 import '../Styles/PostApp.css';
 import axios from 'axios';
-import { context } from './Context';
+import { context } from '../Components/Context';
 
 function Post() {
 
+
   const navigate = useNavigate();
-  const { userID } = useContext(context);
+  const userID=useParams().userID;
+  console.log(userID)
 
   const [name, setName] = useState('');
   const [date, setDate] = useState(new Date());

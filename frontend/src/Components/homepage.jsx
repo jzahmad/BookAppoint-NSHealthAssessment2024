@@ -18,7 +18,7 @@ function Homepage() {
         </nav>
       </div>
 
-      <div>
+      <div className='centered-div'>
         Pick the respective option in nav panel.
       </div>
     </aside>

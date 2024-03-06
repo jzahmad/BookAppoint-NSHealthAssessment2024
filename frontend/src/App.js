@@ -11,6 +11,7 @@ import Apply from './Components/ApplyAppoint';
 import CreateAccount from './Components/CreateAccount';
 import ForgetPassword from './Components/ForgetPassword';
 import { ContextProvider } from './Components/Context';
+import AdminPost from './Components/Admin/AdminPost';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Login />} />
               <Route path="admin/all-appointments" element={<AllAppointments />} />
+              <Route path="/admin/post-appointment" element={<AdminPost />} />
               <Route path="/create" element={<CreateAccount />} />
               <Route path={`/homepage/:userID`} element={<HomePage />} />
               <Route path="/pick-appointments/:userID" element={<Pick />} />
@@ -27,7 +29,7 @@ function App() {
               <Route path="/your-schedule/:userID" element={<YourSchedule />} />
               <Route path="/pick-appointments/:userID/apply/:postID" element={<Apply />} />
               <Route path="/forget" element={<ForgetPassword />} />
-              <Route path="/admin/all-appointments" element={<AllAppointments />} />
+              
             </Routes>
           </ContextProvider>
         </div>

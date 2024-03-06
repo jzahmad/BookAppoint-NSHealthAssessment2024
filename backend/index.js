@@ -108,10 +108,9 @@ app.get('/all', (req, res) => {
  */
 
 app.post('/forget', (req, res) => {
-    const { healthid } = req.body;
-  
+    const  { healthId } = req.body;
     // query the database to retrieve security
-    connection.query('SELECT security_question, security_answer, password FROM users WHERE health_id = ?', healthid, (error, results, fields) => {
+    connection.query('SELECT securityQuestion, securityAnswer, password FROM users WHERE healthid = ?', healthId, (error, results, fields) => {
 
       if (error) {
         res.status(500).json({ error: 'Internal server error' });
@@ -125,8 +124,8 @@ app.post('/forget', (req, res) => {
       }
   
       // If the user is found, return the security question and answer
-      const { security_question, security_answer, password } = results[0];
-      res.status(200).json({ security_question, security_answer,password });
+      const { securityQuestion, securityAnswer, password } = results[0];
+      res.status(200).json({ securityQuestion, securityAnswer,password });
     });
   });
 
@@ -217,6 +216,102 @@ app.post('/applicants', (req, res) => {
       }
     });
   });
+
+  /**
+   * add approve 
+   */
+app.post('/approve', (req, res) => {
+  const { postId, healthId, hospital, duration, dateTime } = req.body.form;
+
+  // Execute SQL query to retrieve user_id based on healthId
+  const getUserIdQuery = `SELECT user_id FROM users WHERE healthid = ${healthId}`;
+
+  connection.query(getUserIdQuery, (error, results, fields) => {
+      if (error) {
+          console.error('Error fetching user_id:', error);
+          res.status(500).json({ error: 'An error occurred while fetching user_id' });
+          return;
+      }
+
+      if (results.length === 0) {
+          console.error('No user found with the provided healthId');
+          res.status(404).json({ error: 'No user found with the provided healthId' });
+          return;
+      }
+
+      // Assuming only one row is returned and it contains the user_id
+      const userId = results[0].user_id;
+
+      // Construct the SQL INSERT statement with the retrieved user_id
+      const insertSql = `INSERT INTO schedules (hospital, s_date, s_time, duration, user_id) VALUES (?, ?, ?, ?, ?)`;
+      const values = [hospital, dateTime.split(' ')[0], dateTime.split(' ')[1], duration, userId];
+
+      // Execute the INSERT query
+      connection.query(insertSql, values, (error, results, fields) => {
+          if (error) {
+              console.error('Error approving appointment:', error);
+              res.status(500).json({ error: 'An error occurred while approving appointment' });
+              return;
+          }
+
+          console.log('Appointment approved successfully');
+          console.log('postId:', postId);
+
+          // Now, remove related records from the apply table
+          const deleteApplySql = `DELETE FROM apply WHERE PostID = ?`;
+          connection.query(deleteApplySql, [postId], (error, results, fields) => {
+              if (error) {
+                  console.error('Error deleting related records from apply table:', error);
+                  res.status(500).json({ error: 'An error occurred while deleting related records from apply table' });
+                  return;
+              }
+
+              console.log('Related records deleted from apply table successfully');
+
+              // Now, delete the post from the posts table
+              const deletePostSql = `DELETE FROM posts WHERE PostID = ?`;
+              connection.query(deletePostSql, [postId], (error, results, fields) => {
+                  if (error) {
+                      console.error('Error deleting post:', error);
+                      res.status(500).json({ error: 'An error occurred while deleting post' });
+                      return;
+                  }
+
+                  console.log('Post deleted successfully');
+
+                  res.status(200).json({ message: 'Appointment approved and post deleted successfully' });
+              });
+          });
+      });
+  });
+});
+
+/**
+ * schedules
+ */
+// Add the /schedules endpoint
+app.post('/schedules', (req, res) => {
+  const { userID } = req.body;
+
+  console.log(userID);
+  // Query the database to fetch schedules for the given user ID
+  connection.query('SELECT * FROM schedules WHERE user_id = ?', userID, (error, results, fields) => {
+      if (error) {
+          console.error('Error fetching schedules:', error);
+          res.status(500).json({ error: 'An error occurred while fetching schedules' });
+          return;
+      }
+
+      // If there are no schedules, send an empty array
+      if (results.length === 0) {
+          res.status(200).json({ schedules: [] });
+          return;
+      }
+
+      // Send the retrieved schedules as response
+      res.status(200).json({ schedules: results });
+  });
+});
 
   
 // Start the server

@@ -37,5 +37,8 @@
     color: #007bff; /* You can adjust the color as needed */
     margin-right: 10px; /* Adjust the spacing between links */
 }
-
+.centered-div {
+  text-align: center;
+  font-size: 24px; /* Change the font size to make it bigger */
+}
   
